@@ -1,0 +1,38 @@
+{
+    "definition": {
+        "openapi": "3.0.0",
+        "info": {
+            "title": "Ecommerce API",
+            "version": "1.0.0",
+            "description": "Node with Express API",
+            "termsOfService": "http://example.com/terms/",
+            "contact": {
+                "name": "API Support",
+                "url": "https://dmarinado.com",
+                "email": "daniel.marinado@gmail.com"
+            }
+        },
+        "servers": [
+            {
+                "url": "http://localhost:8666/api",
+                "description": "My API Documentation"
+            },
+            {
+                "url": "http://213123123.aws.amazon.com",
+                "description": "My API Documentation in Production"
+            }
+        ],
+        "security": [{ "ApiKey": [] }],
+        "components": {
+            "securitySchemes": {
+                "ApiKey": {
+                    "type": "apiKey",
+                    "in": "header",
+                    "name": "authtoken"
+                }
+            }
+        }
+    
+    },
+    "apis": ["./routes/*.js"]
+}
