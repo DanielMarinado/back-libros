@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const { create, listAll, booksCount, removeSoft, read, update, list } = require("../controllers/book");
 const { authCheck, adminCheck } = require("../middlewares/auth");
+const { validateCreateBook, validateUpdateBook } = require("../validators/book");
 
 
-router.post("/book", authCheck, adminCheck, create);
+router.post("/book", authCheck, adminCheck, validateCreateBook, create);
 
 /**
  * @swagger
@@ -41,7 +42,7 @@ router.get("/books/:count", listAll);
 
 router.patch("/book/:slug", authCheck, adminCheck, removeSoft);
 router.get("/book/:slug", read);
-router.put("/book/:slug", authCheck, adminCheck, update);
+router.put("/book/:slug", authCheck, adminCheck, validateUpdateBook, update);
 router.post("/books", list);
 
 module.exports = router;
