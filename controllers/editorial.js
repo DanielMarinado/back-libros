@@ -1,6 +1,6 @@
 const Editorial = require("../models/editorial");
 const slugify = require("slugify");
-const { GET_ASYNC, SET_ASYNC } = require("../redis/index");
+// const { GET_ASYNC, SET_ASYNC } = require("../redis/index");
 const { request } = require("express");
 
 exports.create = async ( req, res ) => {
