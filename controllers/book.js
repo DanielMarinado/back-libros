@@ -4,7 +4,7 @@ const Author = require("../models/author");
 const Country = require("../models/country");
 const Category = require("../models/category");
 const slugify = require("slugify");
-const { GET_ASYNC, SET_ASYNC } = require("../redis/index")
+// const { GET_ASYNC, SET_ASYNC } = require("../redis/index")
 
 
 exports.create = async ( req, res ) => {
@@ -173,6 +173,47 @@ exports.update = async ( req, res ) => {
 }
 
 //list with redis
+// exports.list = async ( req, res ) => {
+//     console.table(req.body);
+//     try {
+//         // createdAt/updatedAt, desc/asc, 3
+//         const { sort, order, page } = req.body;
+//         const currentPage = page | 1;
+//         const perPage = 3;
+
+//         // search data in redis
+//         const reply = await GET_ASYNC(req.originalUrl);
+//         // const reply = await GET_ASYNC("books");
+//         if(reply){
+//             console.log("Using cached data")
+//             return res.send(JSON.parse(reply))
+//         }
+
+//         const books = await Book.find({ status: "Active" })
+//             .skip((currentPage-1) * perPage)
+//             .populate("category")
+//             .sort([[ sort, order]])
+//             .limit(perPage)
+//             .exec();
+
+//         if (!books) {
+//             return res.status(404).json({ msg: "Not found books with status active." });
+//         }
+
+//         const saveResult = await SET_ASYNC(
+//             req.originalUrl,
+//             JSON.stringify(books),
+//             "EX", 
+//             60
+//         );
+
+//         console.log("saved data:", saveResult);
+//         res.json(books);
+//     } catch (error) {
+//         console.log(error)
+//     }
+// }
+
 exports.list = async ( req, res ) => {
     console.table(req.body);
     try {
@@ -181,33 +222,12 @@ exports.list = async ( req, res ) => {
         const currentPage = page | 1;
         const perPage = 3;
 
-        // search data in redis
-        const reply = await GET_ASYNC(req.originalUrl);
-        // const reply = await GET_ASYNC("books");
-        if(reply){
-            console.log("Using cached data")
-            return res.send(JSON.parse(reply))
-        }
-
         const books = await Book.find({ status: "Active" })
             .skip((currentPage-1) * perPage)
             .populate("category")
             .sort([[ sort, order]])
             .limit(perPage)
             .exec();
-
-        if (!books) {
-            return res.status(404).json({ msg: "Not found books with status active." });
-        }
-
-        const saveResult = await SET_ASYNC(
-            req.originalUrl,
-            JSON.stringify(books),
-            "EX", 
-            60
-        );
-
-        console.log("saved data:", saveResult);
         res.json(books);
     } catch (error) {
         console.log(error)
