@@ -83,15 +83,44 @@ exports.removeSoft = async (req, res) => {
     }
 }
 
+// exports.read = async ( req, res ) => {
+//     // const book = await Book.findOne({ slug: req.params.slug, status: "Active" }).exec();
+//     // res.json(book);
+//     try {
+//         const reply = await GET_ASYNC(req.params.slug);
+//         if(reply){
+//             console.log("Using cached data");
+//             return res.send(JSON.parse(reply));
+//         }
+
+//         const book = await Book.findOne({ 
+//             slug: req.params.slug, 
+//             status: "Active" })
+//         .populate("category", "-slug")
+//         .exec();
+
+//         if (!book) {
+//             return res.status(404).json({ msg: "The book do not exist." });
+//         }
+
+//         const saveResult = await SET_ASYNC(
+//             req.params.slug,
+//             JSON.stringify(book),
+//             "EX", 
+//             30
+//         );
+      
+//         console.log("saved data:", saveResult);
+//         res.json(book);
+//     } catch (err) {
+//         res.send(err.message);
+//     }
+// }
+
 exports.read = async ( req, res ) => {
     // const book = await Book.findOne({ slug: req.params.slug, status: "Active" }).exec();
     // res.json(book);
     try {
-        const reply = await GET_ASYNC(req.params.slug);
-        if(reply){
-            console.log("Using cached data");
-            return res.send(JSON.parse(reply));
-        }
 
         const book = await Book.findOne({ 
             slug: req.params.slug, 
@@ -103,14 +132,6 @@ exports.read = async ( req, res ) => {
             return res.status(404).json({ msg: "The book do not exist." });
         }
 
-        const saveResult = await SET_ASYNC(
-            req.params.slug,
-            JSON.stringify(book),
-            "EX", 
-            30
-        );
-      
-        console.log("saved data:", saveResult);
         res.json(book);
     } catch (err) {
         res.send(err.message);
@@ -221,6 +242,10 @@ exports.list = async ( req, res ) => {
         const { sort, order, page } = req.body;
         const currentPage = page | 1;
         const perPage = 3;
+
+        if (!books) {
+            return res.status(404).json({ msg: "Not found books with status active." });
+        }
 
         const books = await Book.find({ status: "Active" })
             .skip((currentPage-1) * perPage)
