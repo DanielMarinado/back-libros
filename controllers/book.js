@@ -10,45 +10,41 @@ const slugify = require("slugify");
 exports.create = async ( req, res ) => {
     try {
         // Obtenemos todas las dependencias
-        const editorial = await Editorial.findOne({ name: req.body.editorial });
-        const author    = await Author.findOne({ name: req.body.author });
-        const country   = await Country.findOne({ name: req.body.country });
-        const category  = await Category.findOne({ name: req.body.category });
+        const editorial = await Editorial.findOne({ slug: req.body.editorial ? slugify(req.body.editorial): "" });
+        const author    = await Author.findOne({ slug: req.body.author ? slugify(req.body.author) : "" });
+        const country   = await Country.findOne({ slug: req.body.country ? slugify(req.body.country) : "" });
+        const category  = await Category.findOne({ slug: req.body.category ? slugify(req.body.category) : "" });
 
         if(editorial){
             req.body.slug = slugify(req.body.title+' '+req.body.editorial);
             req.body.editorial = editorial._id;
         }else{
-            res.status(400).json(`No existe la editorial ${req.body.editorial}`);
+            throw new Error(`No existe editorial ${req.body.editorial}`);
         }
 
         if(author){
             req.body.author = author._id;
         }else{
-            res.status(400).json(`No existe el author ${req.body.author}`);
+            throw new Error(`No existe el autor ${req.body.author}`);
         }
 
         if(country){
             req.body.country = country._id;
         }else{
-            res.status(400).json(`No existe country ${req.body.country}`);
+            throw new Error(`No existe country ${req.body.country}`);
         }
 
         if(category){
             req.body.category = category._id;
         }else{
-            res.status(400).json(`No existe category ${req.body.category}`);
+            throw new Error(`No existe category ${req.body.category}`);
         }
 
         const newBook = await new Book(req.body).save();
 
         res.json(newBook);
     } catch (error) {
-        console.log(error)
-        res.status(400).json({
-            err: error.message,
-            code: err.code,
-        })
+        res.status(400).json(error.message)
     }
 }
 
@@ -69,7 +65,7 @@ exports.removeSoft = async (req, res) => {
     try {
         const deleted = await Book.findOneAndUpdate(
             {
-                slug: req.params.slug,
+                slug: req.params.slug ? slugify(req.params.slug) : "",
             },
             {
                 status: "Inactive",
@@ -93,8 +89,8 @@ exports.removeSoft = async (req, res) => {
 //             return res.send(JSON.parse(reply));
 //         }
 
-//         const book = await Book.findOne({ 
-//             slug: req.params.slug, 
+//         const book = await Book.findOne({
+//             slug: req.params.slug,
 //             status: "Active" })
 //         .populate("category", "-slug")
 //         .exec();
@@ -106,10 +102,10 @@ exports.removeSoft = async (req, res) => {
 //         const saveResult = await SET_ASYNC(
 //             req.params.slug,
 //             JSON.stringify(book),
-//             "EX", 
+//             "EX",
 //             30
 //         );
-      
+
 //         console.log("saved data:", saveResult);
 //         res.json(book);
 //     } catch (err) {
@@ -122,14 +118,14 @@ exports.read = async ( req, res ) => {
     // res.json(book);
     try {
 
-        const book = await Book.findOne({ 
-            slug: req.params.slug, 
+        const book = await Book.findOne({
+            slug: req.params.slug ? slugify(req.params.slug) : "",
             status: "Active" })
         .populate("category", "-slug")
         .exec();
 
         if (!book) {
-            return res.status(404).json({ msg: "The book do not exist." });
+            return res.status(404).json({ msg: "El libro no existe o está inactivo." });
         }
 
         res.json(book);
@@ -141,42 +137,42 @@ exports.read = async ( req, res ) => {
 exports.update = async ( req, res ) => {
     try {
 
-        const bookAnterior = await Book.find({ slug: req.params.slug});
+        const bookAnterior = await Book.find({ slug: req.params.slug ? slugify(req.params.slug) : ""});
 
-        const author    = await Author.findOne({ name: req.body.author });
-        const country   = await Country.findOne({ name: req.body.country });
-        const category  = await Category.findOne({ name: req.body.category });
+        const author    = await Author.findOne({ slug: req.body.author ? slugify(req.body.author) : ""});
+        const country   = await Country.findOne({ slug: req.body.country ? slugify(req.body.country ) : "" });
+        const category  = await Category.findOne({ slug: req.body.category ? slugify(req.body.category) : "" });
 
         if(req.body.title && req.body.editorial){
             const editorial = await Editorial.findOne({ name: req.body.editorial });
             if(editorial){
                 req.body.editorial = editorial._id;
-                req.body.slug = slugify(req.body.title+' '+req.body.editorial);
+                req.body.slug = slugify(req.body.title+' '+editorial.name);
             }
             else
-                res.status(400).json(`No existe la editorial ${req.body.editorial}`);
+                throw new Error(`No existe editorial ${req.body.editorial}`);
         } else if(req.body.title){
             req.body.slug = slugify(req.body.title+' '+bookAnterior.editorial);
         } else{
-            res.status(400).json(`Debe ingresar un título de libro`);
+            throw new Error(`No existe título del libro`);
         }
 
         if(author){
             req.body.author = author._id;
         }else{
-            res.status(400).json(`No existe el author ${req.body.author}`);
+            throw new Error(`No existe author ${req.body.author}`);
         }
 
         if(country){
             req.body.country = country._id;
         }else{
-            res.status(400).json(`No existe country ${req.body.country}`);
+            throw new Error(`No existe country ${req.body.country}`);
         }
 
         if(category){
             req.body.category = category._id;
         }else{
-            res.status(400).json(`No existe category ${req.body.category}`);
+            throw new Error(`No existe category ${req.body.category}`);
         }
 
         const updated = await Book.findOneAndUpdate(
@@ -187,9 +183,7 @@ exports.update = async ( req, res ) => {
         res.json(updated);
     } catch (error) {
         console.log("Book UPDATE ERR -->", error);
-        res.status(400).json({
-            err: err.message,
-        })
+        res.status(400).json(error.message)
     }
 }
 
@@ -224,7 +218,7 @@ exports.update = async ( req, res ) => {
 //         const saveResult = await SET_ASYNC(
 //             req.originalUrl,
 //             JSON.stringify(books),
-//             "EX", 
+//             "EX",
 //             60
 //         );
 
@@ -243,16 +237,18 @@ exports.list = async ( req, res ) => {
         const currentPage = page | 1;
         const perPage = 3;
 
-        if (!books) {
-            return res.status(404).json({ msg: "Not found books with status active." });
-        }
-
         const books = await Book.find({ status: "Active" })
             .skip((currentPage-1) * perPage)
             .populate("category")
             .sort([[ sort, order]])
             .limit(perPage)
             .exec();
+
+        if (!books) {
+            return res.status(404).json({ msg: "Not found books with status active." });
+        }
+
+        
         res.json(books);
     } catch (error) {
         console.log(error)
