@@ -18,7 +18,7 @@
                 "description": "My API Documentation"
             },
             {
-                "url": "http://213123123.aws.amazon.com",
+                "url": "https://server-libros-node.herokuapp.com/",
                 "description": "My API Documentation in Production"
             }
         ],
