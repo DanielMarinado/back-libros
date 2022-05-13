@@ -14,12 +14,12 @@
         },
         "servers": [
             {
-                "url": "http://localhost:8666/api",
-                "description": "My API Documentation"
-            },
-            {
                 "url": "https://server-libros-node.herokuapp.com/api",
                 "description": "My API Documentation in Production"
+            },
+            {
+                "url": "http://localhost:8666/api",
+                "description": "My API Documentation"
             }
         ],
         "security": [{ "ApiKey": [] }],
