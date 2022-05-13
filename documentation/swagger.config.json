@@ -18,7 +18,7 @@
                 "description": "My API Documentation"
             },
             {
-                "url": "https://server-libros-node.herokuapp.com/",
+                "url": "https://server-libros-node.herokuapp.com/api",
                 "description": "My API Documentation in Production"
             }
         ],
